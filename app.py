@@ -129,13 +129,29 @@ if not df_reviews.empty:
     st.sidebar.header("🗓️ 기간 필터")
     min_date = df_reviews['리뷰작성일시'].min().date()
     max_date = df_reviews['리뷰작성일시'].max().date()
-    start_date, end_date = st.sidebar.date_input("조회할 기간을 선택하세요.", (min_date, max_date), min_value=min_date, max_value=max_date, format="YYYY-MM-DD")
+
+    # ############################ #
+    # ##      이 부분 수정      ## #
+    # ############################ #
+    selected_dates = st.sidebar.date_input(
+        "조회할 기간을 선택하세요.",
+        (min_date, max_date),
+        min_value=min_date,
+        max_value=max_date,
+        format="YYYY-MM-DD"
+    )
+
+    if len(selected_dates) != 2:
+        st.stop()
+    
+    start_date, end_date = selected_dates
 
     filtered_df = df_reviews[(df_reviews['리뷰작성일시'].dt.date >= start_date) & (df_reviews['리뷰작성일시'].dt.date <= end_date)]
 
     if filtered_df.empty:
         st.warning("선택된 기간에 해당하는 리뷰 데이터가 없습니다.")
     else:
+        # 이하 코드는 동일합니다.
         keyword_scores_df = analyze_all_keywords_tfidf(filtered_df)
 
         st.header("주요 지표 및 트렌드")
